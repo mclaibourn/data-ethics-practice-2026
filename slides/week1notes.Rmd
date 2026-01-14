@@ -1,0 +1,236 @@
+---
+title: Public Interest Data
+subtitle: Getting Started with R
+author: "Michele Claibourn"
+date: "2026-01-15"
+output: 
+  ioslides_presentation:
+    logo: ../images/pid_hex2.png
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r load}
+# devtools::install_github("ijlyttle/vembedr")
+
+library(tidyverse)
+library(readxl)
+library(knitr)
+library(kableExtra)
+library(vembedr)
+library(RXKCD)
+library(magick)
+```
+
+## Introductions
+```{r capy}
+# # read in images (initial attempt, no space between images)
+# png_list <- list.files("../capybara", pattern = ".png", full.names = TRUE)
+# jpg_list <- list.files("../capybara", pattern = ".jpg", full.names = TRUE)
+# img_list <- append(png_list, jpg_list)
+# 
+# # add border to images 
+# img_load <- map(img_list, image_read) # used img_list created above
+# img_png <- map(img_load, ~image_convert(., "png"))
+# img_ann <- as.character(seq(1,length(img_list))) %>%
+#   str_pad(width = 2, side = "left", pad = "0")
+# annotated_img <- map2(img_png, img_ann, ~image_annotate(.x, .y, size = 30, color = "red"))
+# bordered_img <- map(annotated_img, ~image_border(., "white", "10x5"))
+# img_names <- paste0("../capybara2/capybara_img", img_ann, ".png")
+# map2(bordered_img, img_names, ~image_write(.x, path = .y), format = "png")
+
+img_list2 <- list.files("../capybara2", pattern = "capybara_img", full.names = TRUE)
+
+knitr::include_graphics(img_list2)
+```
+
+
+## Getting Started with R
+
+Who are we wrt R?
+
+```{r familiaR, fig.height = 3.5, fig.align='center'}
+roster <- read_excel("../../roster2026.xlsx",
+                     sheet = 2)
+roster <- roster %>%
+  mutate(expR = fct_infreq(expR))
+
+roster %>%
+  ggplot(aes(x = fct_rev(expR), fill = expR)) +
+  geom_bar() +
+  coord_flip() +
+  scale_fill_viridis_d() +
+  labs(x = "", y = "") +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
+  guides(fill = FALSE)
+```
+
+Wherever you are, you're not alone! As we begin learning R (or learning new things in R), remember...
+
+## "great frustration and much suckiness..." 
+
+As Hadley Wickham, [Chief Scientist](https://posit.co/blog/hadley-wickham-honored-with-the-2025-asa-award-for-statistical-computing-and-graphics/) at Posit, and [lead developer](https://hadley.nz/) of R's ggplot2 and the tidyvere, [observes...](https://www.youtube.com/watch?v=8SGif63VW6E&source_ve_path=MTc4NDI0&t=4m12s)
+
+```{r hadley2, out.width="25%", fig.align="center"}
+knitr::include_graphics("https://hadley.nz/hadley.jpg")
+```
+
+
+## Working in R, RStudio
+
+[R is the computational engine; RStudio is the interface](https://moderndive.com/1-getting-started.html#r-rstudio)
+
+```{r  out.width = "70%", fig.align='center'}
+knitr::include_graphics("../images/rstudio_image.png") 
+```
+
+
+## Organizing R
+Projects allow RStudio to leave notes for itself (e.g., history), will always start a new R session when opened, and will always set the working directory to the Project directory. 
+
+Create a system for [organizing the objects in this project](https://martinctc.github.io/blog/rstudio-projects-and-working-directories-a-beginner%27s-guide/)!
+
+<div style="text-align:center;"><img src="../images/file_structure.png" alt="File Structure Example" width = "30%"></div>
+
+
+## R Packages 
+
+Functions are the “verbs” that allow us to manipulate data. Packages contain functions, and all functions belong to packages.
+
+R comes with about 30 packages (“base R”). There are over 10,000 user-contributed packages; you can discover these packages online in Comprehensive R Archive Network ([CRAN](https://cran.r-project.org/)), with  more in active development on GitHub. 
+
+To use a package, install it **once**
+
+- You can install packages via point-and-click: Tools…Install Packages…Enter `tidyverse` (or a different package name) then click on Install.
+- Or you can use this command in the console: `install.packages("tidyverse")`
+
+In each new R session, you'll have to load the package if you want access to its functions: e.g., type `library(tidyverse)`.
+
+## R Basics
+
+* R is case sensitive
+* Everything in R is an object (vectors, lists, matrices, **data frames**)
+* `#` demarcates code comments
+* `<-` is the assignment operator, how we name new objects in the R environment
+
+## Reading in data
+
+R has two native data formats: 
+
+* .RDS files store a single data object: `readRDS("path/filename.RDS")`, `saveRDS(object, file = "path/filename.RDS")`
+* .RData files stores multiple data objects: `load("path/filename.Rdata")`, `save(object1, object2, file = "path/filename.RData")`, `save.image("path/filename.RData")`
+
+You can import any data format if you know the right `command`/(package):
+
+* CSV: `read.csv` (base R), `read_csv` (tidyverse)
+* Excel: `read_excel` (readxl)
+* Stata, SPSS, SAS: e.g., `read.dta` (foreign), `read_dta` (haven)
+* JSON, fixed-width, TXT, DAT, shape files, etc. 
+
+Primary data types include numeric, integer, logical, and character; plus factors.
+
+## Let's Play with R!
+
+Download R materials from today's canvas page! 
+
+```{r horst, fig.cap='Artwork by @allison_horst', fig.align="center", out.width = "50%"}
+include_graphics("../images/play_forevR.png")
+```
+
+## Some base R commands
+
+Examining data: 
+
+* `names()`
+* `head()` and `tail()`
+* `glimpse()` (dplyr)
+* `summary()`
+
+These (base R) commands will operate on the full object (all variables/columns in a data frame). To access a specific variable/column, use the `$` operator: `df$varname`.
+
+## Some dplyr commands
+
+Part of the the [`tidyverse`](https://www.tidyverse.org/), [`dplyr`](https://dplyr.tidyverse.org/)  is a package for data manipulation. The package implements a *grammar* for transforming data, based on verbs/functions that define a set of common tasks.
+
+`dplyr` functions are for `d`ata frames.
+
+* first argument of `dplyr` functions is always a data frame
+* followed by function specific arguments that detail what to do
+
+[dplyr cheatsheet!](https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-transformation.pdf)
+
+
+## `select()` - extract variables
+
+```{r, eval = FALSE, echo = TRUE}
+select(.data, var1, var2, var3)
+```
+
+`select()` helpers include
+
+* `select(.data, var1:var10)`: select range of columns
+* `select(.data, -c(var1, var2))`: select every column but
+* `select(.data, starts_with("string"))`: select columns that start with... (or ends_with("string"))
+* `select(.data, contains("string"))`: select columns whose names contain...
+
+## `filter()` - extract rows
+
+```{r, eval = FALSE, echo = TRUE}
+filter(.data, var == value)
+```
+
+| Logical tests | Boolean operators for multiple conditions |
+|---------------------|-------------------------------------|
+| `x < y`: less than | `a & b`: and |
+| `y >= y`: greater than or equal to | `a | b`: or |
+| `x == y`: equal to | `xor(a,b)`: exactly or |
+| `x != y`: not equal to | `!a`: not |
+| `x %in% y`: is a member of |  |
+| `is.na(x)`: is NA |  |
+
+## A few more
+
+### `arrange()` - reorder rows
+
+```{r, eval = FALSE, echo = TRUE}
+arrange(.data, var)
+arrange(.data, desc(var))
+```
+
+### `count()` - tabulate values of variables
+
+```{r, eval = FALSE, echo = TRUE}
+count(.data, var)
+```
+
+
+## Pipes!
+The pipe (`%>%`) allows you to chain together functions by passing (piping) the result on the left into the first argument of the function on the right. It allows us to call a series of functions in sequence (read the pipe as "and then...").
+
+```{r, eval = FALSE, echo = TRUE}
+dataframe %>% 
+  filter(var1 > 0) %>% 
+  select(var1, var2, var3) 
+```
+
+#### Keyboard shortcut to create `%>%`
+
+* Mac: cmd + shift + m
+* Windows: ctrl + shift + m
+
+Note: there is also a "base R" pipe operator: `|>` that works similarly. [Albert Rapp has a nice comparison of the two.](https://albert-rapp.de/posts/31_pipes_compared/31_pipes_compared)
+
+
+## `mutate()` - create new variables
+
+Create new columns or alter existing columns
+
+```{r, eval = FALSE, echo = TRUE}
+data %>% 
+  mutate(newvar = var1/var2) 
+```
+
+
