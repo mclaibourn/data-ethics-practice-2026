@@ -14,14 +14,10 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r load}
-# devtools::install_github("ijlyttle/vembedr")
-
 library(tidyverse)
 library(readxl)
 library(knitr)
 library(kableExtra)
-library(vembedr)
-library(RXKCD)
 library(magick)
 ```
 
@@ -47,6 +43,11 @@ img_list2 <- list.files("../capybara2", pattern = "capybara_img", full.names = T
 knitr::include_graphics(img_list2)
 ```
 
+<center>
+
+[Unit of Measure](https://www.poetryfoundation.org/poetrymagazine/poems/52653/unit-of-measure) ~ Sandra Beasley
+
+</center>
 
 ## Getting Started with R
 
