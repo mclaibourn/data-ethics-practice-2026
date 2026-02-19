@@ -1,0 +1,86 @@
+---
+title: Public Interest Data
+subtitle: Separate/Unite, Pivot; Scales in ggplot2, Waffle Plots
+author: "Michele Claibourn"
+date: "2026-02-19"
+output: 
+  ioslides_presentation:
+    logo: ../images/pid_hex2.png
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+
+```{r muppet, fig.align = "center", out.height = "600px"}
+knitr::include_graphics("https://pbs.twimg.com/media/F6GnWj2WoAAMyCA.jpg:small")
+```
+
+## Separate
+`separate`: Split a single column into multiple columns by separating each cell in the column into a row of cells.
+
+```{r sep, out.width = "50%"}
+knitr::include_graphics("../images/tidyr-seperate.png")
+```
+
+`separate(df, col = rate, into = c("cases", "pop"), sep = "/")`
+
+
+## Unite
+
+`unite`: Combine several columns into a single column by uniting their values across rows.
+
+```{r uni, out.width = "50%"}
+knitr::include_graphics("../images/tidyr-unite.png")
+```
+
+`unite(df, col = year, century:year, sep = "")`
+
+
+## Pivot: Longer
+`pivot_longer`: Convert wide data to long, or move variable values out of the column names and into the cells.
+
+```{r long, out.width = "50%"}
+knitr::include_graphics("../images/tidyr-long.png")
+```
+
+`pivot_longer(df, cols = -country, names_to = "year", values_to = "cases")`
+
+
+## Pivot: Wider
+
+`pivot_wider`: Convert long data to wide, or move variable names out of the cells and into the column names.
+
+```{r wide, out.width = "50%"}
+knitr::include_graphics("../images/tidyr-wide.png")
+```
+
+`pivot_wider(df, id_cols = country, names_from = type, values_from = count)`
+
+
+## More Scales
+
+Controlling x,y scales in ggplot
+
+* Discrete scales
+  - limits, breaks, labels
+  - guides
+* Continuous scales
+  - limits, breaks, labels
+  - transformations
+* Scales package: https://scales.r-lib.org/
+  - label (e.g., currency, comma, percent)
+  - transform
+
+## Let's Play with R!
+
+(And some waffle charts -- aka square pie charts!)
+
+```{r, fig.align = 'center', out.width = "50%"}
+knitr::include_graphics("../images/wafflevpie.png")
+```
+
+Download R script from today’s canvas page!
