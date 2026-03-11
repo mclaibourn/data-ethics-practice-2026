@@ -1,0 +1,50 @@
+---
+title: Public Interest Data
+subtitle: Themes, Text, and Annotations in ggplot2
+author: "Michele Claibourn"
+date: "2026-03-12"
+output: 
+  ioslides_presentation:
+    logo: ../images/pid_hex2.png
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+
+```{r scale, fig.align = "center"}
+knitr::include_graphics("../../scales_images/squirrel_scale.jpg")
+```
+
+## Themes
+
+Themes allow you to control the non-data elements of your plot -- the appearance of titles, legends, backgrounds, etc.
+
+* ggplot2 has additional built-in themes
+* Additional packages have pre-built themes (e.g., ggthemes)
+
+For more detail on themes
+
+* https://ggplot2.tidyverse.org/reference/theme.html -- to see all of the possible arguments
+* https://ggplot2-book.org/themes -- to learn all about making theming changes
+
+## Annotation
+
+Adding text:
+
+* `geom_text()`: for labeling plots, like points on a scatterplot or the height of bars
+* `ggtext` package: supports markdown and html elements in ggplot (e.g., we can add colors to text elements)
+* `annotate()`: for adding small text annotations at a particular location on the plot
+
+`annotate()` can also be used to add elements besides text, e.g., arrows, lines, shading. 
+
+## Let's Play with R!
+
+Download R script from today’s canvas page!
+
+```{r, fig.align = 'center', out.width = "50%", fig.cap='Artwork by @allison_horst'}
+knitr::include_graphics("../images/r_overtime.png")
+```
