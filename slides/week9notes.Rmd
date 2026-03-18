@@ -1,0 +1,87 @@
+---
+title: Public Interest Data
+subtitle: Tidycensus, Dates, and Strings
+author: "Michele Claibourn"
+date: "2026-03-19"
+output: 
+  ioslides_presentation:
+    logo: ../images/pid_hex2.png
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## 
+
+```{r scale, fig.align = "center", out.width = "60%"}
+knitr::include_graphics("../../scales_images/owl_scale.jpg")
+```
+
+
+## American Community Survey data and tidycensus
+
+The [tidycensus](https://walker-data.com/tidycensus/) package by Kyle Walker and Matt Herman makes the process of acquiring and working with US Census Bureau population data in R much simpler. 
+
+In addition to installing the package, you need to acquire and set their Census API key. Go to https://api.census.gov/data/key_signup.html to obtain an API key; once you've received it in your email, tell R about it like so (you only need to install it once -- don't add your key to the scripts you share).
+
+```{r, eval = FALSE, echo = TRUE}
+library(tidycensus)
+# census_api_key("YOUR KEY GOES HERE", install = TRUE)
+```
+
+## tidycensus 
+
+Getting  [American Community Survey's](https://www.census.gov/programs-surveys/acs) 5-year (and 1-year) estimates with the `get_acs()` function.
+
+```{r, eval = FALSE, echo = TRUE}
+get_acs(
+  geography = "county", # this determines what spatial geography you want
+  variables = c("var1", "var2"), # these are variable IDs 
+  state = "51", # this is the state fips code for Virginia
+  county = c("003", "540)"), # the county fips codes for Charlotteville and Albemarle
+  survey = "acs5", # for five-year estimates
+  year = 2022, # survey ending in 2022 (2018-2022)
+  output = "tidy" # the default format
+  )
+```
+
+`tidycensus` can be used to pull decennial census data (`get_decennial()`), population estimates data (`get_estimates()`), and a few other sources. 
+
+## ACS geography, ACS variables
+
+* [Geography options](https://walker-data.com/census-r/an-introduction-to-tidycensus.html#geography-and-variables-in-tidycensus) include states, counties, tracts, and more.
+* Finding variable ids requires knowing what table the variables are in and knowing what cell the variables are in within that table.
+    + Finding tables takes some getting used to, but a good resource is the [Census Reporter](https://censusreporter.org/) site.
+    + With a table number in mind, it can be helpful to look for that table at the [data.census.gov](https://data.census.gov/) site
+    + And `tidycensus` provides a `load_variables()` function to drill down for variable IDs within a table -- [worth reading more about!](https://walker-data.com/census-r/an-introduction-to-tidycensus.html#searching-for-variables-in-tidycensus)
+
+For more on tidycensus, see Walker's [Analyzing US Census Data](https://walker-data.com/census-r/index.html)
+
+
+## Dates and times with lubridate
+
+Dates, times, and date-times can be ambiguous (and painful). The [lubridate](https://lubridate.tidyverse.org/) package makes working with these complex objects a little easier, including:
+
+* Functions for making (parsing) date, time, or date-time structures: e.g.,  `ymd()`, `hms()`, `ymd_hms()`, `make_date()`
+* Functions for extracting components from date-time structures: e.g., `year()`, `month()`, `day()`, `wday()`, `mday()`, `yday()`
+* Functions for doing math on date-time structures to calculate intervals, period, and durations: `interval()`, `period()`, `duration()`, `ddays()`
+
+For more, review the [Dates and Times](https://r4ds.hadley.nz/datetimes.html) chapter in R4DS, read [this blogpost](https://library.virginia.edu/data/articles/working-with-dates-and-time-in-r-using-the-lubridate-package) from the UVA Statlab, or refer to this [lubridate cheatsheet](https://rstudio.github.io/cheatsheets/html/lubridate.html)
+
+## Strings with stringr
+
+Working with characters or strings is also a pain. The [stringr](https://stringr.tidyverse.org/) package is meant to make R’s string functions more consistent, simpler and easier to use, including
+
+* Functions to manipulate characters within strings: `str_length(s)`, `str_to_upper(s)`, `str_to_lower(s)`, `str_c(s1,s2)`, `str_split(s, p)`, `str_sub(s, start, end)` 
+* Functions to manipulate white space within strings: `str_pad(s, width)`, `str_trim(s)`, `str_wrap(s, width)`
+* Functions to match patterns within strings: `str_detect(s, p)`, `str_locate(s, p)`, `str_extract(s, p)`, `str_replace(s, p)`, `str_subset(s, p)`, `str_view(s, p)`, `str_count(s, p)`
+
+For more, review the [Strings](https://r4ds.had.co.nz/strings.html) chapter of R4DS, check out this [stringr basics](https://www.gastonsanchez.com/r4strings/stringr-basics.html) chapter, or refer to this [stringr cheatsheet](https://rstudio.github.io/cheatsheets/html/strings.html) 
+
+## Let's Play with R!
+
+```{r, fig.align = 'center', fig.cap='XKCD, Randall Munroe, https://xkcd.com/1638'}
+knitr::include_graphics("https://imgs.xkcd.com/comics/backslashes.png")
+```
