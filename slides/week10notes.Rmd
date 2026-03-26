@@ -32,7 +32,7 @@ And so much more!
 Resources to learn more
 
 * [Geocomputation with R](https://r.geocompx.org/)
-* [R as GIS for Economists](https://tmieno2.github.io/R-as-GIS-for-Economists/index.html)
+* [R as GIS for Economists](https://tmieno2.github.io/R-as-GIS-for-Economists-Quarto/)
 * [Spatial Data Science with Applications in R](https://r-spatial.org/book/)
 
 
@@ -89,7 +89,7 @@ Other spatial visualization options
   + Percentiles: divide data into equally-sized groups (likely unequal widths)
   + Natural breaks (e.g., Jencks): algorithms to find natural groupings based on distribution of data, reduces variation within each class (likely unequal widths and observations)
   + Manual breaks: generally tied to how the data will be used (e.g., categorizing outcomes into tiers)
-  + More on [classification choices](https://storymaps.arcgis.com/stories/871fe556c40b4d40b7a465c6f135ac88)
+  + More on [classification choices](https://storymaps.arcgis.com/stories/1200e9b359c341319bc8e4e4f3bcda30)
 
 As Healey notes: "The first thing you should remember about spatial data is that you don’t have to represent it spatially." And, in  general, choropleths are useful for showing spatial variation in one variable at a time. 
 
