@@ -1,0 +1,173 @@
+---
+title: Public Interest Data
+subtitle: "Getting Fancy with R: Interative visualizations and tables"
+author: "Michele Claibourn"
+date: "2026-04-09"
+output: 
+  ioslides_presentation:
+    logo: ../images/pid_hex2.png
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+# Load libraries
+library(tidyverse)
+library(scales)
+library(ggthemes)
+library(plotly)
+library(reactable)
+library(reactablefmtr)
+library(rcartocolor)
+library(sf)
+library(leaflet)
+```
+
+```{r data}
+# Read data 
+cvl_per <- readRDS("../data/cvl_per_prepped.RDS")
+rent_own_va <- readRDS("../data/rent_own_va_prepped.RDS")
+```
+
+## 
+
+```{r scale, fig.align = "center", out.width = "50%"}
+knitr::include_graphics("../../scales_images/alpaca_scale.jpg")
+```
+
+## Interactive viz
+
+The [plotly package](https://cran.r-project.org/web/packages/plotly/index.html) provides a way of using the [plotly.js library](https://plotly.com/r/) within R
+
+* By creating a plotly object with `plot_ly()`
+* By transforming a ggplot object via `ggplotly()`
+
+`ggplotly()` provides a lot of the functionality of `plot_ly()` without learning the details of `plot_ly()`. Because `ggplotly()` returns a `plot_ly()` object, though, it can be modified with additional `plot_ly()` options.
+
+See [Carson Sievert's book](https://plotly-r.com/) for more, especially [Chapter 2](https://plotly-r.com/overview) and [Chapter 33](https://plotly-r.com/improving-ggplotly)!
+
+## plotly::ggplotly() example
+
+```{r plotly, fig.align = "center", fig.width = 10}
+cvl_per_workers <- cvl_per %>% 
+  filter(!worker_class %in% c("Unemployed", "Not in Labor Force"), 
+         wages < 500000) %>% 
+  droplevels()
+
+# create median value
+med_wage <- cvl_per_workers %>% 
+  group_by(worker_class) %>% 
+  summarize(samp_total = n(),
+            pop_total = sum(pwgtp),
+            med_wage = median(wages, na.rm = TRUE))
+
+fig <- cvl_per_workers %>% 
+  filter(!is.na(educ_att)) %>% 
+  group_by(worker_class, educ_att) %>% 
+  summarize(med_wages = median(wages, na.rm = TRUE)) %>% 
+  ggplot(aes(x = educ_att, y = med_wages, 
+             color = worker_class, group = worker_class,
+             text = paste("Type of Work: ", worker_class, "<br>",
+                          "Educational Attainment: ", educ_att, "<br>",
+                          "Median wages: ", med_wages))) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Educational Attainment", y = "Median Wages") +
+  scale_color_manual(values = 
+                       c("#F28E2B", "#E15759", "#4E79A7", "#76B7B2", "#59A14F", "#EDC948"), 
+                     guide = "none") +
+  scale_y_continuous(labels = label_currency()) +
+  scale_x_discrete(labels = c("No HS\nDeg", "HS\nGrad", "Some\nCollege", 
+                              "College\nGrad", "Masters\nDeg", "Doctoral\nDeg")) +
+  theme_minimal() +
+  theme(legend.position='none')
+
+ggplotly(fig, tooltip = c("text")) 
+```
+
+## Interactive tables
+
+The [reactable package](https://glin.github.io/reactable/) provides a way of using the React Table JavaScript library within R
+
+* Has interactive functionality (sorting, filtering) like DT::datatable()
+* With more formatting and conditionaly styling like kableExtra
+
+With additional and simplified formatting and customization provided in the [reactablefmtr package](https://kcuilla.github.io/reactablefmtr/).
+
+## reactable::reactable() example
+
+```{r reactable}
+# base table
+industry_table <- cvl_per %>% 
+  filter(!is.na(ind_group), ind_group != "no_work") %>% 
+  group_by(ind_group) %>% 
+  summarize(employees = sum(pwgtp),
+            med_wages = median(wages, na.rm = TRUE),
+            med_hours = median(wkhp, na.rm = TRUE),
+            prop_college = sum(schl_num > 20)/employees,
+            prop_private = sum(worker_class == "Private Sector")/employees)
+
+reactable(industry_table,
+          columns = list(
+            ind_group = colDef(name = "Industry"),
+            employees = colDef(name = "Employees"),
+            med_wages = colDef(name = "Median Wages",
+                               format = colFormat(prefix = "$", separators = TRUE)),
+            med_hours = colDef(name = "Hours/ Week"),
+            prop_college = colDef(name = "% College Degree",
+                                  format = colFormat(percent = TRUE, digits = 1),
+                                  style = color_scales(industry_table, 
+                                                       colors = rcartocolor::carto_pal(n = 4, "TealRose"))),
+            prop_private = colDef(name = "% Private Sector",
+                                  format = colFormat(percent = TRUE, digits = 1),
+                                  cell = data_bars(industry_table,
+                                                   number_fmt = scales::percent_format(scale = 100),
+                                                   fill_color = rcartocolor::carto_pal(n = 5, "TealRose")[3]))),
+          showSortable = TRUE, filterable = TRUE, defaultPageSize = 5)
+```
+
+## Interactive maps
+
+The [leaflet package](https://rstudio.github.io/leaflet/) provides an interface to the Leaflet JavaScript library within R. The leaflet package supports
+
+* features like panning and zooming
+* multiple elements like markers, polygons, lines, and popups
+* layered on base map tiles from open street map, cartoDB, esri and [other providers](https://leaflet-extras.github.io/leaflet-providers/preview/) (often with registration)
+
+Other interactive map libraries: tmap, mapview, mapdeck
+
+## leaflet::leaflet() example
+```{r map, fig.width = 10, fig.height = 6}
+# create a palette function
+pal <- colorNumeric(carto_pal(7, "Sunset"), 
+                    reverse = FALSE, 
+                    domain = rent_own_va$prop_renting*100) 
+
+leaflet() %>% 
+  addProviderTiles("CartoDB.Positron") %>% 
+  addPolygons(data = rent_own_va,
+              fillColor = ~pal(prop_renting*100),
+              fillOpacity = 0.8,
+              weight = 2, 
+              opacity = 1,
+              color = "white",
+              highlight = highlightOptions(
+                weight = 3,
+                fillOpacity = 0.9,
+                bringToFront = T),
+              popup = paste0("Locality: ", rent_own_va$county, "<br>",
+                             "% Renting: ", round(rent_own_va$prop_renting*100, 1))) %>% 
+  addLegend("topleft", pal = pal, values = rent_own_va$prop_renting*100, 
+            title = "% Renting", opacity = 0.7)
+```
+
+## Let's Play with R!
+
+Also, don't forget to comment your code!
+
+```{r, fig.align = 'center', out.width = "40%"}
+knitr::include_graphics("https://i.redd.it/iuy9fxt300811.png")
+```
